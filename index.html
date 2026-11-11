@@ -8,71 +8,59 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#EDE6F2;--ink:#2B2547;--muted:#5E5780;--key:#FFFFFF;--keyline:#B9AFD0;
-  color-scheme:light;box-sizing:border-box;
-  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
-}
-@media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]){--bg:#17152A;--ink:#EDE8FA;--muted:#A69FC4;--key:#2A2645;--keyline:#4A4370;color-scheme:dark;}
-}
-:root[data-theme="dark"]{--bg:#17152A;--ink:#EDE8FA;--muted:#A69FC4;--key:#2A2645;--keyline:#4A4370;color-scheme:dark;}
-html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+:root{color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%;background:#0B1330}
 body{
-  height:100%;margin:0;background:var(--bg);color:var(--ink);
+  height:100%;margin:0;background:#0B1330;color:#F3F3EF;overflow:hidden;
   font-family:"Silkscreen",ui-monospace,"Courier New",monospace;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:14px;padding:16px;box-sizing:border-box;
+  display:flex;align-items:center;justify-content:center;
+  touch-action:manipulation;-webkit-touch-callout:none;
 }
-h1{font-weight:600;font-size:clamp(1.4rem,4vw,2rem);margin:0;letter-spacing:.02em}
-.stage{position:relative;width:min(100%,960px,calc((100dvh - 150px) * 5 / 3));aspect-ratio:5/3}
-canvas{width:100%;height:100%;display:block;border-radius:6px;box-shadow:0 0 0 3px var(--ink);touch-action:none}
-canvas:focus-visible{outline:3px solid #FFD23F;outline-offset:4px}
-.hint{color:var(--muted);font-size:1rem;margin:0;text-align:center;max-width:60ch;line-height:1.5}
-kbd{font-family:inherit;background:var(--key);border:1px solid var(--keyline);border-bottom-width:3px;border-radius:5px;padding:0 6px;color:var(--ink)}
-.touch{display:none;position:absolute;left:0;right:0;bottom:0;justify-content:space-between;padding:10px;pointer-events:none}
-.touch .pad{display:flex;gap:10px}
+.stage{position:relative;width:min(100vw,calc(100dvh * 5 / 3));aspect-ratio:5/3;container-type:inline-size}
+canvas{width:100%;height:100%;display:block;touch-action:none}
+canvas:focus{outline:none}
+.touch{display:none;position:absolute;left:0;right:0;bottom:0;justify-content:space-between;padding:2cqw;pointer-events:none}
+.touch .pad{display:flex;gap:2cqw}
 @media (pointer:coarse),(any-pointer:coarse),(hover:none){.touch{display:flex}}
 .touch.on{display:flex}
-body{touch-action:manipulation;-webkit-touch-callout:none}
 .touch button{
-  pointer-events:auto;width:clamp(56px,9vw,96px);height:clamp(56px,9vw,96px);border-radius:50%;
-  border:2px solid rgba(255,255,255,.65);background:rgba(30,25,60,.35);color:#fff;
-  font:600 clamp(20px,3vw,34px) "Silkscreen",monospace;touch-action:none;user-select:none;-webkit-user-select:none;
+  pointer-events:auto;width:clamp(56px,10cqw,220px);height:clamp(56px,10cqw,220px);border-radius:50%;
+  border:max(2px,.3cqw) solid rgba(255,255,255,.65);background:rgba(30,25,60,.35);color:#fff;
+  font:700 clamp(20px,3.6cqw,72px) "Silkscreen",monospace;touch-action:none;user-select:none;-webkit-user-select:none;
 }
 .touch button:active{background:rgba(255,210,63,.45)}
-.panel{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(14,22,48,.72);border-radius:6px;overflow:auto;padding:clamp(8px,2vw,20px);box-sizing:border-box}
+.panel{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(14,22,48,.72);overflow:auto;padding:2cqw;box-sizing:border-box}
 .panel[hidden]{display:none}
-.card{background:#14204A;color:#F3F3EF;border:3px solid #F3F3EF;box-shadow:0 0 0 3px #1A1B22,6px 6px 0 3px rgba(0,0,0,.35);padding:clamp(10px,2.4vw,24px);width:min(100%,560px);display:flex;flex-direction:column;align-items:center;gap:clamp(6px,1.2vw,12px);text-align:center;box-sizing:border-box;margin:auto}
-.card.wide{width:min(100%,640px)}
-.card h2{margin:0;font-weight:600;font-size:clamp(1.1rem,3vw,1.8rem);color:#FFD23F}
-.sub{margin:0;font-size:clamp(.8rem,1.6vw,1rem);color:#C9D6F2;line-height:1.4}
-#nameInput{font:600 clamp(1rem,2.6vw,1.5rem) "Silkscreen",monospace;width:100%;max-width:360px;padding:.4em .6em;border:3px solid #F3F3EF;background:#0B1330;color:#fff;text-align:center;letter-spacing:.08em;text-transform:uppercase;border-radius:0;box-sizing:border-box}
+.card{background:#14204A;color:#F3F3EF;border:max(3px,.35cqw) solid #F3F3EF;box-shadow:0 0 0 max(3px,.35cqw) #1A1B22,.8cqw .8cqw 0 .35cqw rgba(0,0,0,.35);padding:2.4cqw 3cqw;width:min(100%,64cqw);display:flex;flex-direction:column;align-items:center;gap:1.3cqw;text-align:center;box-sizing:border-box;margin:auto}
+.card.wide{width:min(100%,72cqw)}
+.card h2{margin:0;font-weight:700;font-size:max(1.1rem,3.8cqw);color:#FFD23F}
+.sub{margin:0;font-size:max(.75rem,1.7cqw);color:#C9D6F2;line-height:1.4}
+#nameInput{font:700 max(1rem,3cqw) "Silkscreen",monospace;width:100%;max-width:44cqw;padding:.35em .6em;border:max(3px,.35cqw) solid #F3F3EF;background:#0B1330;color:#fff;text-align:center;letter-spacing:.08em;text-transform:uppercase;border-radius:0;box-sizing:border-box}
 #nameInput::placeholder{color:#7083B8;text-transform:none;letter-spacing:0}
-#nameInput:focus{outline:3px solid #47F2FF;outline-offset:2px}
-.osk{display:flex;flex-direction:column;gap:4px;width:100%}
+#nameInput:focus{outline:max(3px,.35cqw) solid #47F2FF;outline-offset:2px}
+.osk{display:flex;flex-direction:column;gap:.6cqw;width:100%}
 .osk[hidden]{display:none}
-.osk .row{display:flex;justify-content:center;gap:4px}
-.osk button{flex:1 1 0;max-width:clamp(28px,5vw,52px);height:clamp(28px,5vw,48px);font:600 clamp(.8rem,1.8vw,1.15rem) "Silkscreen",monospace;background:#2B3A6E;color:#fff;border:2px solid #5F75B8;border-bottom-width:4px;border-radius:4px;touch-action:manipulation;user-select:none;-webkit-user-select:none;padding:0;cursor:pointer}
-.osk button:active{transform:translateY(2px);border-bottom-width:2px}
+.osk .row{display:flex;justify-content:center;gap:.6cqw}
+.osk button{flex:1 1 0;max-width:5.8cqw;min-width:24px;height:max(28px,5cqw);font:700 max(.8rem,2cqw) "Silkscreen",monospace;background:#2B3A6E;color:#fff;border:max(2px,.25cqw) solid #5F75B8;border-bottom-width:max(4px,.5cqw);border-radius:max(4px,.4cqw);touch-action:manipulation;user-select:none;-webkit-user-select:none;padding:0;cursor:pointer}
+.osk button:active{transform:translateY(.25cqw);border-bottom-width:max(2px,.25cqw)}
 .osk button.wide{max-width:none;flex:3 1 0}
-.osk button.go{background:#FFD23F;color:#1A1B22;border-color:#9C7A12}
-.primary{font:600 clamp(1rem,2.4vw,1.4rem) "Silkscreen",monospace;background:#FFD23F;color:#1A1B22;border:3px solid #1A1B22;box-shadow:0 4px 0 #9C7A12;padding:.35em 1.6em;cursor:pointer;touch-action:manipulation}
+.osk button.go{max-width:none;flex:1.6 1 0;background:#FFD23F;color:#1A1B22;border-color:#9C7A12}
+.primary{font:700 max(1rem,2.8cqw) "Silkscreen",monospace;background:#FFD23F;color:#1A1B22;border:max(3px,.35cqw) solid #1A1B22;box-shadow:0 .5cqw 0 #9C7A12;padding:.35em 1.6em;cursor:pointer;touch-action:manipulation}
 .primary:disabled{opacity:.45;cursor:default}
-.primary:active:not(:disabled){transform:translateY(3px);box-shadow:0 1px 0 #9C7A12}
-.link{background:none;border:none;color:#9FD8FF;font:400 clamp(.8rem,1.6vw,1rem) "Silkscreen",monospace;text-decoration:underline;cursor:pointer;padding:4px}
-.lb{width:100%;border-collapse:collapse;font-size:clamp(.75rem,1.7vw,1.05rem)}
-.lb th{color:#9FD8FF;font-weight:600;padding:3px 6px;border-bottom:2px solid #3B4D86;text-align:left}
-.lb td{padding:3px 6px;text-align:left}
+.primary:active:not(:disabled){transform:translateY(.35cqw);box-shadow:0 .15cqw 0 #9C7A12}
+.links{display:flex;gap:3cqw;justify-content:center;flex-wrap:wrap}
+.link{background:none;border:none;color:#9FD8FF;font:400 max(.75rem,1.7cqw) "Silkscreen",monospace;text-decoration:underline;cursor:pointer;padding:4px}
+.link[hidden],.links[hidden]{display:none}
+.lb{width:100%;border-collapse:collapse;font-size:max(.75rem,2cqw)}
+.lb th{color:#9FD8FF;font-weight:700;padding:.4cqw .9cqw;border-bottom:max(2px,.25cqw) solid #3B4D86;text-align:left}
+.lb td{padding:.4cqw .9cqw;text-align:left}
 .lb td:nth-child(n+3),.lb th:nth-child(n+3){text-align:right;font-variant-numeric:tabular-nums}
 .lb tr.me td{background:#FFD23F;color:#1A1B22}
 .lb tr.gap td{color:#6F7FAF;text-align:center}
-.lb tr.empty td{text-align:center;color:#8EA0D0;padding:12px}
-.note{margin:0;font-size:clamp(.7rem,1.4vw,.85rem);color:#8EA0D0}
+.lb tr.empty td{text-align:center;color:#8EA0D0;padding:1.4cqw}
 </style>
 </head>
 <body>
-<h1>Robot Run</h1>
 <div class="stage">
   <canvas id="game" tabindex="0" aria-label="Platformer game. Use arrow keys to move and space to jump."></canvas>
   <div class="touch" aria-hidden="true">
@@ -89,7 +77,10 @@ body{touch-action:manipulation;-webkit-touch-callout:none}
       <input id="nameInput" maxlength="12" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" placeholder="Your name" aria-label="Your name">
       <div class="osk" id="osk" hidden></div>
       <button class="primary" id="startBtn" type="button" disabled>Start</button>
-      <button class="link" id="boardBtn" type="button">View leaderboard</button>
+      <div class="links">
+        <button class="link" id="boardBtn" type="button">View leaderboard</button>
+        <button class="link" id="fsBtn" type="button" hidden>Full screen</button>
+      </div>
     </div>
   </div>
   <div class="panel" id="boardPanel" hidden>
@@ -103,7 +94,6 @@ body{touch-action:manipulation;-webkit-touch-callout:none}
     </div>
   </div>
 </div>
-<p class="hint">Move with <kbd>←</kbd> <kbd>→</kbd> or <kbd>A</kbd> <kbd>D</kbd>, jump with <kbd>Space</kbd>. Hold jump to go higher. Stomp the prickles, bump the star crates, collect the gems, and reach the lantern before the 90-second timer runs out.</p>
 
 <script>
 (() => {
@@ -187,7 +177,16 @@ const LOGO_PX = (() => {
 
 const cv = document.getElementById('game');
 const ctx = cv.getContext('2d');
-cv.width = VW * 2; cv.height = VH * 2;
+let SCALE = 2;
+cv.width = VW * SCALE; cv.height = VH * SCALE;
+function fitCanvas() {
+  const w = cv.getBoundingClientRect().width || VW;
+  const k = Math.max(1, Math.min(8, Math.ceil(w * (window.devicePixelRatio || 1) / VW)));
+  if (k !== SCALE) { SCALE = k; cv.width = VW * k; cv.height = VH * k; }
+}
+addEventListener('resize', fitCanvas);
+if (window.ResizeObserver) new ResizeObserver(fitCanvas).observe(cv);
+fitCanvas();
 
 let grid, coins, spawns, bumps;
 let player, enemies, popups;
@@ -569,7 +568,7 @@ function overlay(title, lines) {
 }
 
 function draw() {
-  ctx.setTransform(2, 0, 0, 2, 0, 0);
+  ctx.setTransform(SCALE, 0, 0, SCALE, 0, 0);
   drawBackground();
   ctx.save();
   ctx.translate(-Math.round(cam), 0);
@@ -613,13 +612,13 @@ function syncName() {
 function tryStart() {
   const v = cleanName(nameInput.value).trim().toUpperCase();
   if (!v) { nameInput.focus(); return; }
-  osk.hidden = true; nameSub.hidden = false; boardBtn.hidden = false;
+  osk.hidden = true; nameSub.hidden = false; boardBtn.parentElement.hidden = false;
   nameInput.blur();
   startGame(v);
 }
 function openKeyboard() {
   if (!isTouch) return;
-  osk.hidden = false; nameSub.hidden = true; boardBtn.hidden = true;
+  osk.hidden = false; nameSub.hidden = true; boardBtn.parentElement.hidden = true;
 }
 nameInput.addEventListener('focus', openKeyboard);
 nameInput.addEventListener('pointerdown', openKeyboard);
@@ -652,6 +651,21 @@ osk.addEventListener('pointerdown', e => {
   else if (nameInput.value.length < 12 && !(v === ' ' && !nameInput.value)) nameInput.value += v;
   syncName();
 });
+
+
+// ---------- Full screen ----------
+const fsBtn = document.getElementById('fsBtn');
+const root = document.documentElement;
+const canFs = !!(root.requestFullscreen || root.webkitRequestFullscreen);
+const isFs = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
+function syncFs() { fsBtn.hidden = !canFs; fsBtn.textContent = isFs() ? 'Exit full screen' : 'Full screen'; }
+fsBtn.addEventListener('click', () => {
+  if (isFs()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+  else (root.requestFullscreen || root.webkitRequestFullscreen).call(root);
+});
+document.addEventListener('fullscreenchange', syncFs);
+document.addEventListener('webkitfullscreenchange', syncFs);
+syncFs();
 
 // ---------- Leaderboard ----------
 const LS_KEY = 'robot-run-leaderboard-v1';
@@ -723,7 +737,7 @@ function showNameEntry() {
   state = 'name';
   boardPanel.hidden = true; namePanel.hidden = false;
   nameInput.value = ''; syncName();
-  osk.hidden = true; nameSub.hidden = false; boardBtn.hidden = false;
+  osk.hidden = true; nameSub.hidden = false; boardBtn.parentElement.hidden = false;
   if (!isTouch) nameInput.focus();
 }
 boardBtn.addEventListener('click', () => {
