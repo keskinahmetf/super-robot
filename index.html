@@ -73,7 +73,7 @@ canvas:focus{outline:none}
   <div class="panel" id="namePanel">
     <div class="card">
       <h2>Enter your name</h2>
-      <p class="sub" id="nameSub">Collect gems and reach the lantern within 90 seconds. More gems and a faster finish mean more points.</p>
+      <p class="sub" id="nameSub">Collect gems and reach the flag within 90 seconds. More gems and a faster finish mean more points.</p>
       <input id="nameInput" maxlength="12" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" placeholder="Your name" aria-label="Your name">
       <div class="osk" id="osk" hidden></div>
       <button class="primary" id="startBtn" type="button" disabled>Start</button>
@@ -151,6 +151,57 @@ const FR = {
   jump: makeFrame('up', 'tuck'),
   cheer: makeFrame('up', 'stand')
 };
+// ---------- Pixel helpers: enemies, hearts, finish flag ----------
+function pix(rows, pal) {
+  const c = document.createElement('canvas'); c.width = rows[0].length; c.height = rows.length;
+  const g = c.getContext('2d');
+  rows.forEach((r, y) => { for (let x = 0; x < r.length; x++) if (pal[r[x]]) { g.fillStyle = pal[r[x]]; g.fillRect(x, y, 1, 1); } });
+  return c;
+}
+const EPAL = {o: '#2E1A45', p: '#8E5DB8', l: '#B98BE0', s: '#E6D3FA', w: '#FFFFFF', e: '#2E1A45'};
+const EBODY = ['...s..s..s..', '..oooooooo..', '.oppppppppo.', 'opwwpppwwppo', 'opewpppewppo', 'oppppppppplo', 'oppooooopplo', '.oppppppplo.', '..oooooooo..'];
+const ENEMY = [pix(EBODY.concat(['..oo....oo..']), EPAL), pix(EBODY.concat(['...oo..oo...']), EPAL)];
+const ENEMY_FLAT = pix(['..oooooooo..', '.opwwppwwpo.', 'oppppppppplo', '.oooooooooo.'], EPAL);
+const HEART = pix(['.ooo.ooo.', 'orwrorrro', 'orwrrrrro', 'orrrrrrdo', '.orrrrdo.', '..orrdo..', '...odo...', '....o....'],
+  {o: '#3A0A18', r: '#FF4D6D', w: '#FFD0DA', d: '#B3123E'});
+const POLE_BALL = pix(['..oooo..', '.oyyyyo.', 'oywyyyyo', 'oyyyyydo', 'oyyyyydo', 'oyyyyddo', '.oyddd o.'.replace(' ', ''), '..oooo..'],
+  {o: '#5A4410', y: '#FFD23F', w: '#FFF6C8', d: '#C9971A'});
+const FLAG_PX = (() => {
+  const G = {S: ['.###', '#...', '.##.', '...#', '###.'], A: ['.##.', '#..#', '####', '#..#', '#..#'], P: ['###.', '#..#', '###.', '#...', '#...']};
+  const c = document.createElement('canvas'); c.width = 20; c.height = 10;
+  const g = c.getContext('2d');
+  for (let y = 0; y < 10; y++) {
+    g.fillStyle = y < 3 ? '#19B9F0' : y < 7 ? '#0E8EDB' : '#1E63BE';
+    g.fillRect(0, y, 20 - y, 1);
+  }
+  g.fillStyle = '#FFFFFF';
+  [['S', 2], ['A', 7], ['P', 12]].forEach(([ch, ox]) =>
+    G[ch].forEach((r, y) => { for (let x = 0; x < 4; x++) if (r[x] === '#') g.fillRect(ox + x, 2 + y, 1, 1); }));
+  return c;
+})();
+const CONFETTI_COLORS = ['#FFD23F', '#FF4D6D', '#47F2FF', '#9BE564', '#9A5CF0', '#19B9F0', '#FFFFFF'];
+let confetti = [];
+function launchConfetti() {
+  confetti = [];
+  const px = player.x + player.w / 2 - cam, py = player.y;
+  for (let i = 0; i < 90; i++) confetti.push({x: Math.random() * VW, y: -Math.random() * 120, vx: (Math.random() - 0.5) * 1.5, vy: 1 + Math.random() * 2,
+    c: CONFETTI_COLORS[i % CONFETTI_COLORS.length], ph: Math.random() * 6});
+  for (let i = 0; i < 60; i++) confetti.push({x: px, y: py, vx: (Math.random() - 0.5) * 9, vy: -3 - Math.random() * 6,
+    c: CONFETTI_COLORS[(i * 3) % CONFETTI_COLORS.length], ph: Math.random() * 6});
+}
+function updateConfetti() {
+  for (const q of confetti) { q.vy = Math.min(q.vy + 0.18, 3.2); q.vx *= 0.97; q.x += q.vx + Math.sin(frame * 0.1 + q.ph) * 0.4; q.y += q.vy; }
+  confetti = confetti.filter(q => q.y < VH + 10);
+}
+function drawConfetti() {
+  for (const q of confetti) {
+    const x = Math.round(q.x / 2) * 2, y = Math.round(q.y / 2) * 2;
+    const turn = Math.floor(frame / 6 + q.ph) % 3;
+    ctx.fillStyle = q.c;
+    if (turn === 0) ctx.fillRect(x, y, 6, 2); else if (turn === 1) ctx.fillRect(x, y, 4, 4); else ctx.fillRect(x, y, 2, 6);
+  }
+}
+
 // ---------- Pixel-art gem logo (16x14) ----------
 const LOGO_PX = (() => {
   const P = {o: '#24127A', d: '#3A1FC8', m: '#5B2BE8', l: '#9A5CF0', p: '#D58BF0', w: '#FFFFFF'};
@@ -242,7 +293,7 @@ function resetEnemies() {
 function startGame(name) {
   playerName = name;
   buildLevel();
-  coinCount = 0; lives = 3; checkpoint = 3; popups = []; ticks = 0;
+  coinCount = 0; lives = 3; checkpoint = 3; popups = []; ticks = 0; confetti = [];
   keys.left = keys.right = keys.jump = false;
   namePanel.hidden = true; boardPanel.hidden = true;
   spawnPlayer(0); resetEnemies();
@@ -350,7 +401,7 @@ function updatePlayer() {
   if (p.inv > 0) p.inv--;
   if (p.x > 80 * T && checkpoint < 80) checkpoint = 80;
   if (p.y > H * T + 30) { hurt(true); return; }
-  if (p.x + p.w > GOAL_X * T + 8 && p.x < GOAL_X * T + 24) { state = 'win'; winT = 100; finishTime = ticks / 60; p.vx = 0; }
+  if (p.x + p.w > GOAL_X * T + 8 && p.x < GOAL_X * T + 24) { state = 'win'; winT = 100; finishTime = ticks / 60; p.vx = 0; launchConfetti(); }
 }
 
 function updateEnemies() {
@@ -385,6 +436,7 @@ function update() {
   if (state === 'play' || state === 'dying') {
     if (++ticks >= TIME_LIMIT * 60) { endRun('time'); return; }
   }
+  updateConfetti();
   if (state === 'win') { if (--winT <= 0) endRun('win'); return; }
   if (state === 'play') {
     updatePlayer();
@@ -489,16 +541,21 @@ function drawCoins() {
 }
 
 function drawGoal() {
-  const x = GOAL_X * T;
-  if (x < cam - 80 || x > cam + VW + 80) return;
-  ctx.fillStyle = '#4E3828'; ctx.fillRect(x + 13, 6 * T, 6, 4 * T);
-  ctx.fillRect(x + 8, 6 * T - 4, 16, 4);
-  const glow = ctx.createRadialGradient(x + 16, 6 * T - 18, 2, x + 16, 6 * T - 18, 46 + Math.sin(frame * 0.08) * 4);
-  glow.addColorStop(0, 'rgba(255,210,63,0.6)'); glow.addColorStop(1, 'rgba(255,210,63,0)');
-  ctx.fillStyle = glow; ctx.fillRect(x - 40, 6 * T - 70, 112, 110);
-  ctx.fillStyle = '#3A2A1E'; ctx.fillRect(x + 6, 6 * T - 30, 20, 26);
-  ctx.fillStyle = '#FFD23F'; ctx.fillRect(x + 9, 6 * T - 27, 14, 20);
-  ctx.fillStyle = '#FFF2B8'; ctx.fillRect(x + 13, 6 * T - 23, 6, 12);
+  const x = GOAL_X * T + 14;
+  if (x < cam - 100 || x > cam + VW + 100) return;
+  ctx.save(); ctx.imageSmoothingEnabled = false;
+  ctx.fillStyle = '#5F597E'; ctx.fillRect(x - 8, 10 * T - 8, 20, 8);
+  ctx.fillStyle = '#8C86A8'; ctx.fillRect(x - 6, 10 * T - 8, 16, 2);
+  ctx.fillStyle = '#2B2D3A'; ctx.fillRect(x - 1, 4 * T, 6, 6 * T - 8);
+  ctx.fillStyle = '#E4E6EF'; ctx.fillRect(x, 4 * T, 3, 6 * T - 8);
+  ctx.fillStyle = '#A3A6BC'; ctx.fillRect(x + 3, 4 * T, 1, 6 * T - 8);
+  ctx.drawImage(POLE_BALL, x - 6, 4 * T - 14, 16, 16);
+  const S = 3, fx = x + 5, fy = 4 * T + 6;
+  for (let col = 0; col < 20; col++) {
+    const dy = Math.round(Math.sin(frame * 0.12 - col * 0.45) * (col / 19) * 1.5);
+    ctx.drawImage(FLAG_PX, col, 0, 1, 10, fx + col * S, fy + dy * S, S, 10 * S);
+  }
+  ctx.restore();
 }
 
 function drawPlayer() {
@@ -518,19 +575,13 @@ function drawPlayer() {
 }
 
 function drawEnemy(e) {
-  const cx = e.x + 12, by = e.y + e.h;
-  if (e.dead > 0) { ellipse(cx, by - 4, 14, 4, '#8E5DB8'); return; }
-  const dir = e.vx < 0 ? -1 : 1, s = Math.sin(frame * 0.25 + e.x) * 1.5;
-  ellipse(cx - 6, by - 2 + s, 4, 2.5, '#4A2E66'); ellipse(cx + 6, by - 2 - s, 4, 2.5, '#4A2E66');
-  ctx.fillStyle = '#C9A2E8';
-  for (let i = -1.5; i <= 1.5; i++) {
-    ctx.beginPath(); ctx.moveTo(cx + i * 6 - 3.5, by - 15); ctx.lineTo(cx + i * 6, by - 25 + Math.abs(i) * 2); ctx.lineTo(cx + i * 6 + 3.5, by - 15); ctx.fill();
-  }
-  ellipse(cx, by - 10, 12, 9.5, '#8E5DB8');
-  ellipse(cx - 4, by - 11, 3, 3.5, '#FFFFFF'); ellipse(cx + 4, by - 11, 3, 3.5, '#FFFFFF');
-  ellipse(cx - 4 + dir, by - 10.5, 1.4, 2, '#2E1A45'); ellipse(cx + 4 + dir, by - 10.5, 1.4, 2, '#2E1A45');
-  ctx.strokeStyle = '#2E1A45'; ctx.lineWidth = 1.5; ctx.beginPath();
-  ctx.moveTo(cx - 7, by - 16); ctx.lineTo(cx - 2, by - 14); ctx.moveTo(cx + 7, by - 16); ctx.lineTo(cx + 2, by - 14); ctx.stroke();
+  ctx.save(); ctx.imageSmoothingEnabled = false;
+  const x = Math.round(e.x), y = Math.round(e.y);
+  if (e.dead > 0) { ctx.drawImage(ENEMY_FLAT, x, y + 12, 24, 8); ctx.restore(); return; }
+  const img = ENEMY[Math.floor(frame / 10 + e.x * 0.01) % 2];
+  if (e.vx > 0) { ctx.translate(x + 24, y); ctx.scale(-1, 1); ctx.drawImage(img, 0, 0, 24, 20); }
+  else ctx.drawImage(img, x, y, 24, 20);
+  ctx.restore();
 }
 
 function text(str, x, y, size, align, color, weight) {
@@ -540,11 +591,9 @@ function text(str, x, y, size, align, color, weight) {
   ctx.fillStyle = color || '#FFFFFF'; ctx.fillText(str, x, y);
 }
 function heart(x, y) {
-  ctx.fillStyle = '#FF6B8B'; ctx.beginPath();
-  ctx.moveTo(x, y + 4); ctx.bezierCurveTo(x, y - 2, x - 8, y - 2, x - 8, y + 4);
-  ctx.bezierCurveTo(x - 8, y + 9, x, y + 12, x, y + 15);
-  ctx.bezierCurveTo(x, y + 12, x + 8, y + 9, x + 8, y + 4);
-  ctx.bezierCurveTo(x + 8, y - 2, x, y - 2, x, y + 4); ctx.fill();
+  ctx.save(); ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(HEART, Math.round(x) - 9, Math.round(y), 18, 16);
+  ctx.restore();
 }
 
 function drawHUD() {
@@ -581,7 +630,7 @@ function draw() {
   }
   ctx.restore();
   if (state !== 'name') drawHUD();
-  if (state === 'win') overlay('You reached the lantern!', [coinCount + ' gems in ' + finishTime.toFixed(1) + ' seconds']);
+  drawConfetti();
 }
 
 
