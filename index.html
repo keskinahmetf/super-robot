@@ -16,7 +16,11 @@ body{
   display:flex;align-items:center;justify-content:center;
   touch-action:manipulation;-webkit-touch-callout:none;
 }
-.stage{position:relative;width:min(100vw,calc(100dvh * 5 / 3));aspect-ratio:5/3;container-type:inline-size}
+.stage{position:relative;width:100vw;height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));container-type:size;transition:width .25s ease,height .25s ease}
+.stage.compact{width:60vw;height:60dvh;box-shadow:0 0 0 max(3px,.4cqh) #F3F3EF,0 0 0 max(6px,.8cqh) #1A1B22,0 1.5cqh 0 max(6px,.8cqh) rgba(0,0,0,.35)}
+.sizeBtn{position:absolute;top:2.2cqh;right:max(8px,1.2cqw);width:max(36px,8cqh);height:max(36px,8cqh);padding:0;display:grid;place-items:center;background:rgba(14,22,48,.55);color:#fff;border:max(2px,.45cqh) solid rgba(255,255,255,.8);border-radius:0;cursor:pointer;z-index:5;touch-action:manipulation}
+.sizeBtn:active{background:rgba(255,210,63,.5)}
+.sizeBtn svg{width:60%;height:60%;shape-rendering:crispEdges}
 canvas{width:100%;height:100%;display:block;touch-action:none}
 canvas:focus{outline:none}
 .touch{display:none;position:absolute;left:0;right:0;bottom:0;justify-content:space-between;padding:2cqw;pointer-events:none}
@@ -93,13 +97,16 @@ canvas:focus{outline:none}
       <button class="primary" id="againBtn" type="button">Play again</button>
     </div>
   </div>
+  <button class="sizeBtn" id="sizeBtn" type="button" aria-label="Make game smaller"></button>
 </div>
 
 <script>
 (() => {
-const T = 32, VW = 640, VH = 384, H = 12, W = 150;
+const T = 32, VH = 384, H = 12, W = 160;
+let VW = 640;
 const SOLID = new Set(['#', '=', 'S', 'B', 'E']);
 const GOAL_X = 138;
+const BUILD_X = 143;
 // ---------- Pixel-art robot ----------
 const PAL = {K:'#1A1B22', W:'#F3F3EF', G:'#C2C5CF', V:'#0E0F14', C:'#47F2FF', c:'#1AA6C4', D:'#3B3C46'};
 const HEAD = [
@@ -189,6 +196,22 @@ function launchConfetti() {
   for (let i = 0; i < 60; i++) confetti.push({x: px, y: py, vx: (Math.random() - 0.5) * 9, vy: -3 - Math.random() * 6,
     c: CONFETTI_COLORS[(i * 3) % CONFETTI_COLORS.length], ph: Math.random() * 6});
 }
+function updateWin() {
+  const p = player, doorX = BUILD_X * T + 196;
+  cam = Math.min(clamp(p.x - VW * 0.4, cam, W * T - VW), W * T - VW);
+  if (winPhase === 'walk') {
+    p.face = 1;
+    p.vx = 3;
+    p.vy = Math.min(p.vy + 0.6, 12);
+    move(p);
+    p.run += Math.abs(p.vx) * 0.05;
+    if (p.x + p.w / 2 >= doorX) { p.x = doorX - p.w / 2; p.vx = 0; winPhase = 'enter'; winT = 24; }
+  } else if (winPhase === 'enter') {
+    p.vy = Math.min(p.vy + 0.6, 12); move(p);
+    if (--winT <= 0) { winPhase = 'party'; winT = 110; launchConfetti(); }
+  } else if (--winT <= 0) endRun('win');
+}
+
 function updateConfetti() {
   for (const q of confetti) { q.vy = Math.min(q.vy + 0.18, 3.2); q.vx *= 0.97; q.x += q.vx + Math.sin(frame * 0.1 + q.ph) * 0.4; q.y += q.vy; }
   confetti = confetti.filter(q => q.y < VH + 10);
@@ -231,10 +254,29 @@ const ctx = cv.getContext('2d');
 let SCALE = 2;
 cv.width = VW * SCALE; cv.height = VH * SCALE;
 function fitCanvas() {
-  const w = cv.getBoundingClientRect().width || VW;
-  const k = Math.max(1, Math.min(8, Math.ceil(w * (window.devicePixelRatio || 1) / VW)));
-  if (k !== SCALE) { SCALE = k; cv.width = VW * k; cv.height = VH * k; }
+  const r = cv.getBoundingClientRect();
+  if (!r.width || !r.height) return;
+  VW = Math.max(480, Math.min(1100, VH * r.width / r.height));
+  const k = Math.max(1, Math.min(8, Math.ceil(r.height * (window.devicePixelRatio || 1) / VH)));
+  const cw = Math.round(VW * k), ch = VH * k;
+  SCALE = k;
+  if (cv.width !== cw || cv.height !== ch) { cv.width = cw; cv.height = ch; }
 }
+// ---------- Window size toggle ----------
+const stageEl = document.querySelector('.stage');
+const sizeBtn = document.getElementById('sizeBtn');
+const ICON_MAX = '<svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M2 2h5v2H4v3H2zM9 2h5v5h-2V4H9zM2 9h2v3h3v2H2zM12 9h2v5H9v-2h3z"/></svg>';
+const ICON_MIN = '<svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M5 2h2v5H2V5h3zM9 2h2v3h3v2H9zM2 9h5v5H5v-3H2zM9 9h5v2h-3v3H9z"/></svg>';
+function setCompact(on) {
+  stageEl.classList.toggle('compact', on);
+  sizeBtn.innerHTML = on ? ICON_MAX : ICON_MIN;
+  sizeBtn.setAttribute('aria-label', on ? 'Make game bigger' : 'Make game smaller');
+  try { localStorage.setItem('robot-run-compact', on ? '1' : '0'); } catch (e) {}
+}
+sizeBtn.addEventListener('click', () => { setCompact(!stageEl.classList.contains('compact')); sizeBtn.blur(); if (state === 'play') cv.focus(); });
+let startCompact = false;
+try { startCompact = localStorage.getItem('robot-run-compact') === '1'; } catch (e) {}
+setCompact(startCompact);
 addEventListener('resize', fitCanvas);
 if (window.ResizeObserver) new ResizeObserver(fitCanvas).observe(cv);
 fitCanvas();
@@ -243,11 +285,11 @@ let grid, coins, spawns, bumps;
 let player, enemies, popups;
 const TIME_LIMIT = 90;
 let state = 'name', coinCount = 0, lives = 3, cam = 0, frame = 0;
-let ticks = 0, winT = 0, finishTime = 0, playerName = '';
+let ticks = 0, winT = 0, finishTime = 0, playerName = '', winPhase = 'walk';
 let checkpoint = 3, dyingT = 0;
 
 const stars = Array.from({length: 45}, (_, i) => ({
-  x: (i * 137.5) % 900, y: (i * 53.3) % 170, r: (i % 3) * 0.4 + 0.6
+  x: (i * 137.5) % 1300, y: (i * 53.3) % 170, r: (i % 3) * 0.4 + 0.6
 }));
 
 // ---------- Level ----------
@@ -293,7 +335,7 @@ function resetEnemies() {
 function startGame(name) {
   playerName = name;
   buildLevel();
-  coinCount = 0; lives = 3; checkpoint = 3; popups = []; ticks = 0; confetti = [];
+  coinCount = 0; lives = 3; checkpoint = 3; popups = []; ticks = 0; confetti = []; winPhase = 'walk';
   keys.left = keys.right = keys.jump = false;
   namePanel.hidden = true; boardPanel.hidden = true;
   spawnPlayer(0); resetEnemies();
@@ -401,7 +443,7 @@ function updatePlayer() {
   if (p.inv > 0) p.inv--;
   if (p.x > 80 * T && checkpoint < 80) checkpoint = 80;
   if (p.y > H * T + 30) { hurt(true); return; }
-  if (p.x + p.w > GOAL_X * T + 8 && p.x < GOAL_X * T + 24) { state = 'win'; winT = 100; finishTime = ticks / 60; p.vx = 0; launchConfetti(); }
+  if (p.x + p.w > GOAL_X * T + 8 && p.x < GOAL_X * T + 24) { state = 'win'; winPhase = 'walk'; winT = 0; finishTime = ticks / 60; }
 }
 
 function updateEnemies() {
@@ -437,12 +479,12 @@ function update() {
     if (++ticks >= TIME_LIMIT * 60) { endRun('time'); return; }
   }
   updateConfetti();
-  if (state === 'win') { if (--winT <= 0) endRun('win'); return; }
+  if (state === 'win') { updateWin(); return; }
   if (state === 'play') {
     updatePlayer();
     if (state === 'play') updateEnemies();
     if (state === 'play') checkCoins();
-    cam = clamp(player.x - VW * 0.4, cam, W * T - VW);
+    cam = Math.min(clamp(player.x - VW * 0.4, cam, W * T - VW), W * T - VW);
   } else if (state === 'dying') {
     player.vy += 0.5; player.y += player.vy;
     if (--dyingT <= 0) {
@@ -477,7 +519,7 @@ function drawBackground() {
   ctx.fillStyle = g; ctx.fillRect(0, 0, VW, VH);
   ctx.fillStyle = 'rgba(255,240,220,0.7)';
   for (const s of stars) {
-    const x = ((s.x - cam * 0.05) % 900 + 900) % 900 - 100;
+    const x = ((s.x - cam * 0.05) % 1300 + 1300) % 1300 - 100;
     ctx.fillRect(x, s.y, s.r * 2, s.r * 2);
   }
   ellipse(470 - cam * 0.03, 255, 58, 58, 'rgba(255,236,190,0.95)');
@@ -540,6 +582,72 @@ function drawCoins() {
   }
 }
 
+// ---------- Pixel-art office building (end of level) ----------
+function drawBuilding() {
+  const u = 2, bx = BUILD_X * T, by = 10 * T;
+  if (bx > cam + VW + 20 || bx + 200 * u < cam) return;
+  const OUT = '#3A3F4B', FAC = '#B8BDC7', LIT = '#D6DAE1', SHD = '#8E94A1', GL = '#3B4B63', GLH = '#6F8BB0',
+        MUL = '#2A3242', AG = '#5FA3C7', AGL = '#9FD3EA';
+  const R = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(bx + x * u, by - (y + h) * u, w * u, h * u); };
+  const roof = (x0, w, h) => {
+    R(x0 - 1, h + 1, w + 2, 1, OUT);
+    R(x0, h + 4, w, 1, OUT);
+    for (let i = 1; i < w; i += 6) R(x0 + i, h + 2, 1, 2, OUT);
+  };
+  const wing = (x0, w, h) => {
+    R(x0 - 1, 0, w + 2, h + 1, OUT);
+    R(x0, 0, w, h, FAC);
+    R(x0, h - 2, w, 2, LIT);
+    R(x0 + w - 2, 0, 2, h - 2, SHD);
+    for (let f = 0; f < 5; f++) {
+      const b = 6 + f * 15;
+      R(x0 + 2, b + 2, w - 5, 1, SHD);
+      R(x0 + 2, b + 3, w - 5, 7, GL);
+      R(x0 + 2, b + 9, w - 5, 1, GLH);
+      for (let mx = x0 + 2; mx < x0 + w - 3; mx += 4) R(mx, b + 3, 1, 7, MUL);
+    }
+    roof(x0, w, h);
+  };
+  const tower = (x0, w, h) => {
+    R(x0 - 1, 0, w + 2, h + 1, OUT);
+    R(x0, 0, w, h, LIT);
+    R(x0 + w - 2, 0, 2, h - 2, SHD);
+    R(x0 + 4, 6, w - 8, h - 14, AG);
+    R(x0 + 4, 6, 1, h - 14, AGL);
+    for (let y = 10; y < h - 8; y += 6) R(x0 + 4, y, w - 8, 1, MUL);
+    R(x0 - 1, h - 3, w + 2, 2, FAC);
+    roof(x0, w, h);
+  };
+  // right wing rooftop structure
+  R(123, 88, 54, 9, OUT); R(124, 88, 52, 8, '#9AA0AC');
+  for (let x = 127; x < 175; x += 4) R(x, 89, 1, 6, '#7C8290');
+  wing(14, 66, 85);
+  wing(116, 66, 85);
+  tower(0, 14, 92);
+  tower(182, 14, 92);
+  // central glass atrium
+  R(79, 0, 38, 79, OUT);
+  R(80, 0, 36, 78, AG);
+  for (let x = 80; x < 116; x += 6) R(x, 0, 1, 78, MUL);
+  for (let y = 8; y < 78; y += 8) R(80, y, 36, 1, MUL);
+  R(80, 76, 36, 2, LIT);
+  R(87, 0, 22, 15, OUT); R(88, 0, 20, 14, '#26303F');
+  if (state === 'win' && winPhase !== 'walk') { R(89, 0, 18, 13, '#FFD98A'); R(91, 0, 14, 11, '#FFF2C8'); }
+  R(97, 0, 2, 14, OUT); R(89, 12, 18, 1, GLH);
+  // logo on the right wing
+  ctx.save(); ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(FLAG_PX, bx + 148 * u, by - 82 * u, 30 * u, 15 * u);
+  ctx.restore();
+  // planters and bushes along the front
+  [20, 34, 48, 62, 130, 144, 158, 172].forEach(x => {
+    R(x - 1, 0, 8, 6, OUT); R(x, 0, 6, 5, '#F2F2EE'); R(x, 4, 6, 1, '#C9CCD3');
+    R(x, 5, 6, 3, '#4E8B3A'); R(x + 1, 7, 4, 1, '#6FB04F');
+  });
+  [[74, 9], [118, 7], [186, 10], [-6, 8]].forEach(([x, w]) => {
+    R(x, 0, w, 5, '#3F7A30'); R(x + 1, 5, w - 2, 2, '#4E8B3A'); R(x + 2, 6, 2, 1, '#7CC25A');
+  });
+}
+
 function drawGoal() {
   const x = GOAL_X * T + 14;
   if (x < cam - 100 || x > cam + VW + 100) return;
@@ -560,9 +668,15 @@ function drawGoal() {
 
 function drawPlayer() {
   const p = player;
+  if (state === 'board' && winPhase === 'party') return;
   if (state === 'play' && p.inv > 0 && frame % 6 < 3) return;
   let f, bob = 0;
-  if (state === 'win') { f = FR.cheer; bob = -Math.abs(Math.sin(frame * 0.12)) * 6; }
+  if (state === 'win') {
+    if (winPhase === 'party') return;
+    if (winPhase === 'enter') f = FR.idle;
+    else if (!p.onGround) f = FR.jump;
+    else { f = FR.run[Math.floor(p.run) % 4]; if (Math.floor(p.run) % 2) bob = -2; }
+  }
   else if (state === 'dying' || !p.onGround) f = FR.jump;
   else if (Math.abs(p.vx) > 0.4) { f = FR.run[Math.floor(p.run) % 4]; if (Math.floor(p.run) % 2) bob = -2; }
   else { f = frame % 180 < 8 ? FR.blink : FR.idle; bob = Math.floor(frame / 30) % 2 ? -1 : 0; }
@@ -570,6 +684,7 @@ function drawPlayer() {
   ctx.imageSmoothingEnabled = false;
   ctx.translate(Math.round(p.x + p.w / 2), Math.round(p.y + p.h + bob));
   if (p.face < 0 && state !== 'win') ctx.scale(-1, 1);
+  if (state === 'win' && winPhase === 'enter') ctx.globalAlpha = Math.max(0, winT / 24);
   ctx.drawImage(f, -16, -52, 32, 52);
   ctx.restore();
 }
@@ -603,7 +718,7 @@ function drawHUD() {
   drawToken(160, 22, 1);
   text('× ' + coinCount, 180, 28, 18);
   if (playerName) text(playerName, VW / 2 + 40, 28, 16, 'center', '#FFE8A3', 400);
-  for (let i = 0; i < lives; i++) heart(VW - 24 - i * 24, 14);
+  for (let i = 0; i < lives; i++) heart(VW - 66 - i * 24, 14);
 }
 
 function overlay(title, lines) {
@@ -621,7 +736,7 @@ function draw() {
   drawBackground();
   ctx.save();
   ctx.translate(-Math.round(cam), 0);
-  drawTiles(); drawCoins(); drawGoal();
+  drawBuilding(); drawTiles(); drawCoins(); drawGoal();
   for (const e of enemies) if (e.alive && e.x > cam - 40 && e.x < cam + VW + 40) drawEnemy(e);
   drawPlayer();
   for (const o of popups || []) {
