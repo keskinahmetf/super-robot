@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Robot Run</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,69 +16,79 @@ body{
   display:flex;align-items:center;justify-content:center;
   touch-action:manipulation;-webkit-touch-callout:none;
 }
-.stage{position:relative;width:100vw;height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));container-type:size;transition:width .25s ease,height .25s ease}
+.stage{position:relative;width:100vw;height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));container-type:size;--u:min(1cqw,1.6667cqh);transition:width .25s ease,height .25s ease}
 .stage.compact{width:60vw;height:60dvh;box-shadow:0 0 0 max(3px,.4cqh) #F3F3EF,0 0 0 max(6px,.8cqh) #1A1B22,0 1.5cqh 0 max(6px,.8cqh) rgba(0,0,0,.35)}
-.sizeBtn{position:absolute;top:2.2cqh;right:max(8px,1.2cqw);width:max(36px,8cqh);height:max(36px,8cqh);padding:0;display:grid;place-items:center;background:rgba(14,22,48,.55);color:#fff;border:max(2px,.45cqh) solid rgba(255,255,255,.8);border-radius:0;cursor:pointer;z-index:5;touch-action:manipulation}
+.sizeBtn{position:absolute;top:calc(1.32*var(--u));right:calc(1.2*var(--u));width:calc(4.8*var(--u));height:calc(4.8*var(--u));padding:0;display:grid;place-items:center;background:rgba(14,22,48,.55);color:#fff;border:calc(0.27*var(--u)) solid rgba(255,255,255,.8);border-radius:0;cursor:pointer;z-index:5;touch-action:manipulation}
 .sizeBtn:active{background:rgba(255,210,63,.5)}
 .sizeBtn svg{width:60%;height:60%;shape-rendering:crispEdges}
 canvas{width:100%;height:100%;display:block;touch-action:none}
 canvas:focus{outline:none}
-.touch{display:none;position:absolute;left:0;right:0;bottom:0;justify-content:space-between;padding:2cqw;pointer-events:none}
-.touch .pad{display:flex;gap:2cqw}
-@media (pointer:coarse),(any-pointer:coarse),(hover:none){.touch{display:flex}}
-.touch.on{display:flex}
+.touch{display:flex;position:absolute;left:0;right:0;bottom:0;justify-content:space-between;padding:calc(2*var(--u));pointer-events:none}
+.touch .pad{display:flex;gap:calc(2*var(--u))}
 .touch button{
-  pointer-events:auto;width:clamp(56px,10cqw,220px);height:clamp(56px,10cqw,220px);border-radius:50%;
-  border:max(2px,.3cqw) solid rgba(255,255,255,.65);background:rgba(30,25,60,.35);color:#fff;
-  font:700 clamp(20px,3.6cqw,72px) "Silkscreen",monospace;touch-action:none;user-select:none;-webkit-user-select:none;
+  pointer-events:auto;width:calc(10*var(--u));height:calc(10*var(--u));border-radius:50%;padding:0;
+  display:grid;place-items:center;
+  border:calc(.3*var(--u)) solid rgba(255,255,255,.65);background:rgba(30,25,60,.35);color:#fff;
+  touch-action:none;user-select:none;-webkit-user-select:none;cursor:pointer;
 }
+.touch button svg{width:52%;height:52%;shape-rendering:crispEdges;pointer-events:none}
 .touch button:active{background:rgba(255,210,63,.45)}
-.panel{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(14,22,48,.72);overflow:auto;padding:2cqw;box-sizing:border-box}
+.panel{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(14,22,48,.72);overflow:auto;padding:calc(2*var(--u));box-sizing:border-box}
 .panel[hidden]{display:none}
-.card{background:#14204A;color:#F3F3EF;border:max(3px,.35cqw) solid #F3F3EF;box-shadow:0 0 0 max(3px,.35cqw) #1A1B22,.8cqw .8cqw 0 .35cqw rgba(0,0,0,.35);padding:2.4cqw 3cqw;width:min(100%,64cqw);display:flex;flex-direction:column;align-items:center;gap:1.3cqw;text-align:center;box-sizing:border-box;margin:auto}
-.card.wide{width:min(100%,72cqw)}
-.card h2{margin:0;font-weight:700;font-size:max(1.1rem,3.8cqw);color:#FFD23F}
-.sub{margin:0;font-size:max(.75rem,1.7cqw);color:#C9D6F2;line-height:1.4}
-#nameInput{font:700 max(1rem,3cqw) "Silkscreen",monospace;width:100%;max-width:44cqw;padding:.35em .6em;border:max(3px,.35cqw) solid #F3F3EF;background:#0B1330;color:#fff;text-align:center;letter-spacing:.08em;text-transform:uppercase;border-radius:0;box-sizing:border-box}
+.card{background:#14204A;color:#F3F3EF;border:calc(.35*var(--u)) solid #F3F3EF;box-shadow:0 0 0 calc(.35*var(--u)) #1A1B22,calc(.8*var(--u)) calc(.8*var(--u)) 0 calc(.35*var(--u)) rgba(0,0,0,.35);padding:calc(2.4*var(--u)) calc(3*var(--u));width:min(100%,calc(64*var(--u)));display:flex;flex-direction:column;align-items:center;gap:calc(1.3*var(--u));text-align:center;box-sizing:border-box;margin:auto}
+.card.wide{width:min(100%,calc(72*var(--u)))}
+.card h2{margin:0;font-weight:700;font-size:calc(3.8*var(--u));color:#FFD23F}
+.sub{margin:0;font-size:calc(1.7*var(--u));color:#C9D6F2;line-height:1.4}
+#nameInput{font:700 calc(3*var(--u)) "Silkscreen",monospace;width:100%;max-width:calc(44*var(--u));padding:.35em .6em;border:calc(.35*var(--u)) solid #F3F3EF;background:#0B1330;color:#fff;text-align:center;letter-spacing:.08em;text-transform:uppercase;border-radius:0;box-sizing:border-box}
+#pwInput{font:700 calc(3*var(--u)) "Silkscreen",monospace;width:100%;max-width:calc(44*var(--u));padding:.35em .6em;border:calc(.35*var(--u)) solid #F3F3EF;background:#0B1330;color:#fff;text-align:center;letter-spacing:.08em;text-transform:uppercase;border-radius:0;box-sizing:border-box}
 #nameInput::placeholder{color:#7083B8;text-transform:none;letter-spacing:0}
-#nameInput:focus{outline:max(3px,.35cqw) solid #47F2FF;outline-offset:2px}
-.osk{display:flex;flex-direction:column;gap:.6cqw;width:100%}
+#nameInput,#pwInput{cursor:default;caret-color:transparent}
+#nameInput:focus{outline:calc(.35*var(--u)) solid #47F2FF;outline-offset:2px}
+.osk{display:flex;flex-direction:column;gap:calc(.6*var(--u));width:100%}
 .osk[hidden]{display:none}
-.osk .row{display:flex;justify-content:center;gap:.6cqw}
-.osk button{flex:1 1 0;max-width:5.8cqw;min-width:24px;height:max(28px,5cqw);font:700 max(.8rem,2cqw) "Silkscreen",monospace;background:#2B3A6E;color:#fff;border:max(2px,.25cqw) solid #5F75B8;border-bottom-width:max(4px,.5cqw);border-radius:max(4px,.4cqw);touch-action:manipulation;user-select:none;-webkit-user-select:none;padding:0;cursor:pointer}
-.osk button:active{transform:translateY(.25cqw);border-bottom-width:max(2px,.25cqw)}
+.osk .row{display:flex;justify-content:center;gap:calc(.6*var(--u))}
+.osk button{flex:1 1 0;max-width:calc(5.8*var(--u));height:calc(5*var(--u));font:700 calc(2*var(--u)) "Silkscreen",monospace;background:#2B3A6E;color:#fff;border:calc(.25*var(--u)) solid #5F75B8;border-bottom-width:calc(.5*var(--u));border-radius:calc(.4*var(--u));touch-action:manipulation;user-select:none;-webkit-user-select:none;padding:0;cursor:pointer}
+.osk button:active{transform:translateY(calc(.25*var(--u)));border-bottom-width:calc(.25*var(--u))}
 .osk button.wide{max-width:none;flex:3 1 0}
 .osk button.go{max-width:none;flex:1.6 1 0;background:#FFD23F;color:#1A1B22;border-color:#9C7A12}
-.primary{font:700 max(1rem,2.8cqw) "Silkscreen",monospace;background:#FFD23F;color:#1A1B22;border:max(3px,.35cqw) solid #1A1B22;box-shadow:0 .5cqw 0 #9C7A12;padding:.35em 1.6em;cursor:pointer;touch-action:manipulation}
+.primary{font:700 calc(2.8*var(--u)) "Silkscreen",monospace;background:#FFD23F;color:#1A1B22;border:calc(.35*var(--u)) solid #1A1B22;box-shadow:0 calc(.5*var(--u)) 0 #9C7A12;padding:.35em 1.6em;cursor:pointer;touch-action:manipulation}
 .primary:disabled{opacity:.45;cursor:default}
-.primary:active:not(:disabled){transform:translateY(.35cqw);box-shadow:0 .15cqw 0 #9C7A12}
-.links{display:flex;gap:3cqw;justify-content:center;flex-wrap:wrap}
-.link{background:none;border:none;color:#9FD8FF;font:400 max(.75rem,1.7cqw) "Silkscreen",monospace;text-decoration:underline;cursor:pointer;padding:4px}
+.primary:active:not(:disabled){transform:translateY(calc(.35*var(--u)));box-shadow:0 calc(.15*var(--u)) 0 #9C7A12}
+.links{display:flex;gap:calc(3*var(--u));justify-content:center;flex-wrap:wrap}
+.link{background:none;border:none;color:#9FD8FF;font:400 calc(1.7*var(--u)) "Silkscreen",monospace;text-decoration:underline;cursor:pointer;padding:4px}
 .link[hidden],.links[hidden]{display:none}
-.lb{width:100%;border-collapse:collapse;font-size:max(.75rem,2cqw)}
-.lb th{color:#9FD8FF;font-weight:700;padding:.4cqw .9cqw;border-bottom:max(2px,.25cqw) solid #3B4D86;text-align:left}
-.lb td{padding:.4cqw .9cqw;text-align:left}
+.lb{width:100%;border-collapse:collapse;font-size:calc(2*var(--u))}
+.lb th{color:#9FD8FF;font-weight:700;padding:calc(.4*var(--u)) calc(.9*var(--u));border-bottom:calc(.25*var(--u)) solid #3B4D86;text-align:left}
+.lb td{padding:calc(.4*var(--u)) calc(.9*var(--u));text-align:left}
 .lb td:nth-child(n+3),.lb th:nth-child(n+3){text-align:right;font-variant-numeric:tabular-nums}
 .lb tr.me td{background:#FFD23F;color:#1A1B22}
 .lb tr.gap td{color:#6F7FAF;text-align:center}
-.lb tr.empty td{text-align:center;color:#8EA0D0;padding:1.4cqw}
+.resetBtn{position:absolute;right:calc(2*var(--u));bottom:calc(2*var(--u));width:calc(6*var(--u));height:calc(6*var(--u));padding:0;display:grid;place-items:center;background:rgba(14,22,48,.75);color:#fff;border:calc(.35*var(--u)) solid rgba(255,255,255,.8);cursor:pointer;touch-action:manipulation;z-index:2}
+.resetBtn:active{background:rgba(255,210,63,.5)}
+.resetBtn svg{width:60%;height:60%;shape-rendering:crispEdges}
+.panel.top{z-index:6}
+.pwmsg{margin:0;min-height:1.4em;font-size:calc(1.8*var(--u));color:#FF8FA3}
+.pwmsg.ok{color:#9BE564}
+.pwbtns{display:flex;gap:calc(2*var(--u));justify-content:center}
+.primary.ghost{background:#2B3A6E;color:#fff;border-color:#5F75B8;box-shadow:0 calc(.5*var(--u)) 0 #1A2550}
+.lb tr.empty td{text-align:center;color:#8EA0D0;padding:calc(1.4*var(--u))}
 </style>
 </head>
 <body>
 <div class="stage">
   <canvas id="game" tabindex="0" aria-label="Platformer game. Use arrow keys to move and space to jump."></canvas>
   <div class="touch" aria-hidden="true">
-    <button data-k="jump" class="jump">⤒</button>
+    <button data-k="jump" class="jump" aria-label="Jump"><svg viewBox="0 0 13 13" aria-hidden="true"><g transform="translate(1 1)"><path d="M1 4h5V1h1v1h1v1h1v1h1v1h1v2h-1v1h-1v1h-1v1h-1v1h-1v1H6V8H1z" fill="#1A1B22" transform="rotate(-90 6 6)"/></g><path d="M1 4h5V1h1v1h1v1h1v1h1v1h1v2h-1v1h-1v1h-1v1h-1v1h-1v1H6V8H1z" fill="#FFFFFF" transform="rotate(-90 6 6)"/></svg></button>
     <div class="pad">
-      <button data-k="left">◀</button>
-      <button data-k="right">▶</button>
+      <button data-k="left" aria-label="Left"><svg viewBox="0 0 13 13" aria-hidden="true"><g transform="translate(1 1)"><path d="M1 4h5V1h1v1h1v1h1v1h1v1h1v2h-1v1h-1v1h-1v1h-1v1h-1v1H6V8H1z" fill="#1A1B22" transform="translate(12 0) scale(-1 1)"/></g><path d="M1 4h5V1h1v1h1v1h1v1h1v1h1v2h-1v1h-1v1h-1v1h-1v1h-1v1H6V8H1z" fill="#FFFFFF" transform="translate(12 0) scale(-1 1)"/></svg></button>
+      <button data-k="right" aria-label="Right"><svg viewBox="0 0 13 13" aria-hidden="true"><g transform="translate(1 1)"><path d="M1 4h5V1h1v1h1v1h1v1h1v1h1v2h-1v1h-1v1h-1v1h-1v1h-1v1H6V8H1z" fill="#1A1B22" transform=""/></g><path d="M1 4h5V1h1v1h1v1h1v1h1v1h1v2h-1v1h-1v1h-1v1h-1v1h-1v1H6V8H1z" fill="#FFFFFF" transform=""/></svg></button>
     </div>
   </div>
   <div class="panel" id="namePanel">
     <div class="card">
       <h2>Enter your name</h2>
       <p class="sub" id="nameSub">Collect gems and reach the flag within 90 seconds. More gems and a faster finish mean more points.</p>
-      <input id="nameInput" maxlength="12" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" placeholder="Your name" aria-label="Your name">
+      <input id="nameInput" readonly inputmode="none" tabindex="-1" maxlength="12" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" placeholder="Your name" aria-label="Your name">
       <div class="osk" id="osk" hidden></div>
       <button class="primary" id="startBtn" type="button" disabled>Start</button>
       <div class="links">
@@ -95,6 +105,19 @@ canvas:focus{outline:none}
         <tbody id="lbBody"></tbody>
       </table>
       <button class="primary" id="againBtn" type="button">Play again</button>
+    </div>
+    <button class="resetBtn" id="resetBtn" type="button" aria-label="Reset scoreboard"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M5 1h6v2h2v2h-2v2h-2V5H7V3H5zM3 3h2v2H3zM1 5h2v6H1zM3 11h2v2H3zM5 13h6v2H5zM11 11h2v2h-2zM13 7h2v4h-2zM9 7h6v2H9z"/></svg></button>
+  </div>
+  <div class="panel top" id="pwPanel" hidden>
+    <div class="card">
+      <h2>Reset scoreboard</h2>
+      <input id="pwInput" readonly inputmode="none" tabindex="-1" placeholder="Password" aria-label="Password">
+      <div class="osk" id="pwOsk"></div>
+      <p class="pwmsg" id="pwMsg"></p>
+      <div class="pwbtns">
+        <button class="primary ghost" id="pwCancel" type="button">Cancel</button>
+        <button class="primary" id="pwOk" type="button">Reset</button>
+      </div>
     </div>
   </div>
   <button class="sizeBtn" id="sizeBtn" type="button" aria-label="Make game smaller"></button>
@@ -271,12 +294,9 @@ function setCompact(on) {
   stageEl.classList.toggle('compact', on);
   sizeBtn.innerHTML = on ? ICON_MAX : ICON_MIN;
   sizeBtn.setAttribute('aria-label', on ? 'Make game bigger' : 'Make game smaller');
-  try { localStorage.setItem('robot-run-compact', on ? '1' : '0'); } catch (e) {}
 }
 sizeBtn.addEventListener('click', () => { setCompact(!stageEl.classList.contains('compact')); sizeBtn.blur(); if (state === 'play') cv.focus(); });
-let startCompact = false;
-try { startCompact = localStorage.getItem('robot-run-compact') === '1'; } catch (e) {}
-setCompact(startCompact);
+setCompact(false);
 addEventListener('resize', fitCanvas);
 if (window.ResizeObserver) new ResizeObserver(fitCanvas).observe(cv);
 fitCanvas();
@@ -383,6 +403,7 @@ const KEYMAP = {ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'rig
                 Space: 'jump', ArrowUp: 'jump', KeyW: 'jump', KeyZ: 'jump'};
 addEventListener('keydown', e => {
   if (e.target instanceof HTMLInputElement) return;
+  if (!pwPanel.hidden) return;
   if (state === 'board' && e.code === 'Enter' && !boardPanel.hidden) { e.preventDefault(); againBtn.click(); return; }
   if (state !== 'play' && state !== 'dying') return;
   const k = KEYMAP[e.code];
@@ -758,15 +779,24 @@ const boardBtn = document.getElementById('boardBtn');
 const againBtn = document.getElementById('againBtn');
 const osk = document.getElementById('osk');
 const nameSub = document.getElementById('nameSub');
-let isTouch = matchMedia('(pointer:coarse),(any-pointer:coarse),(hover:none)').matches;
-function markTouch() {
-  isTouch = true;
-  nameInput.setAttribute('inputmode', 'none');
-  document.querySelector('.touch').classList.add('on');
-}
-if (isTouch) markTouch();
-addEventListener('touchstart', markTouch, {passive: true});
-
+// Every screen gets the same controls: built-in keyboard and touch buttons are always shown.
+document.addEventListener('gesturestart', e => e.preventDefault());
+addEventListener('wheel', e => { if (e.ctrlKey) e.preventDefault(); }, {passive: false});
+addEventListener('keydown', e => {
+  if (e.ctrlKey && ['+', '-', '=', '0'].includes(e.key)) e.preventDefault();
+  if (!pwPanel.hidden) {
+    e.preventDefault();
+    if (e.key === 'Enter') pwKey('DONE');
+    else if (e.key === 'Escape') closePw();
+    else if (e.key === 'Backspace') pwKey('BACK');
+    else if (e.key.length === 1) pwKey(e.key.toUpperCase());
+    return;
+  }
+  if (state !== 'name' || namePanel.hidden) return;
+  if (e.key === 'Enter') { e.preventDefault(); tryStart(); return; }
+  if (e.key === 'Backspace') { e.preventDefault(); typeKey('BACK'); return; }
+  if (e.key.length === 1 && /[\p{L}\p{N} ._-]/u.test(e.key)) { e.preventDefault(); typeKey(e.key.toUpperCase()); }
+});
 const cleanName = v => v.replace(/[^\p{L}\p{N} ._-]/gu, '').replace(/\s+/g, ' ').slice(0, 12);
 function syncName() {
   const v = cleanName(nameInput.value);
@@ -775,19 +805,15 @@ function syncName() {
 }
 function tryStart() {
   const v = cleanName(nameInput.value).trim().toUpperCase();
-  if (!v) { nameInput.focus(); return; }
-  osk.hidden = true; nameSub.hidden = false; boardBtn.parentElement.hidden = false;
-  nameInput.blur();
+  if (!v) return;
   startGame(v);
 }
-function openKeyboard() {
-  if (!isTouch) return;
-  osk.hidden = false; nameSub.hidden = true; boardBtn.parentElement.hidden = true;
+function typeKey(v) {
+  if (v === 'BACK') nameInput.value = nameInput.value.slice(0, -1);
+  else if (nameInput.value.length < 12 && !(v === ' ' && !nameInput.value)) nameInput.value += v;
+  syncName();
 }
-nameInput.addEventListener('focus', openKeyboard);
-nameInput.addEventListener('pointerdown', openKeyboard);
-nameInput.addEventListener('input', syncName);
-nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); tryStart(); } });
+nameInput.addEventListener('focus', () => nameInput.blur());
 startBtn.addEventListener('click', tryStart);
 
 const keyBtn = (label, v, cls) => {
@@ -797,24 +823,23 @@ const keyBtn = (label, v, cls) => {
   if (v === 'BACK') b.setAttribute('aria-label', 'Delete');
   return b;
 };
-['1234567890', 'QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM'].forEach(r => {
-  const row = document.createElement('div'); row.className = 'row';
-  for (const ch of r) row.append(keyBtn(ch, ch));
-  osk.append(row);
-});
-const lastRow = document.createElement('div'); lastRow.className = 'row';
-lastRow.append(keyBtn('⌫', 'BACK'), keyBtn('Space', ' ', 'wide'), keyBtn('Done', 'DONE', 'go'));
-osk.append(lastRow);
-osk.addEventListener('mousedown', e => e.preventDefault());
-osk.addEventListener('pointerdown', e => {
-  const b = e.target.closest('button'); if (!b) return;
-  e.preventDefault();
-  const v = b.dataset.v;
-  if (v === 'DONE') { tryStart(); return; }
-  if (v === 'BACK') nameInput.value = nameInput.value.slice(0, -1);
-  else if (nameInput.value.length < 12 && !(v === ' ' && !nameInput.value)) nameInput.value += v;
-  syncName();
-});
+function buildKeyboard(box, doneLabel, onKey) {
+  ['1234567890', 'QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM'].forEach(r => {
+    const row = document.createElement('div'); row.className = 'row';
+    for (const ch of r) row.append(keyBtn(ch, ch));
+    box.append(row);
+  });
+  const lastRow = document.createElement('div'); lastRow.className = 'row';
+  lastRow.append(keyBtn('⌫', 'BACK'), keyBtn('Space', ' ', 'wide'), keyBtn(doneLabel, 'DONE', 'go'));
+  box.append(lastRow);
+  box.addEventListener('mousedown', e => e.preventDefault());
+  box.addEventListener('pointerdown', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    e.preventDefault();
+    onKey(b.dataset.v);
+  });
+}
+buildKeyboard(osk, 'Done', v => { if (v === 'DONE') tryStart(); else typeKey(v); });
 
 
 // ---------- Full screen ----------
@@ -901,8 +926,8 @@ function showNameEntry() {
   state = 'name';
   boardPanel.hidden = true; namePanel.hidden = false;
   nameInput.value = ''; syncName();
-  osk.hidden = true; nameSub.hidden = false; boardBtn.parentElement.hidden = false;
-  if (!isTouch) nameInput.focus();
+  osk.hidden = false; nameSub.hidden = true; boardBtn.parentElement.hidden = false;
+  setCompact(false);
 }
 boardBtn.addEventListener('click', () => {
   LB.mine = null; renderBoard();
@@ -912,6 +937,51 @@ boardBtn.addEventListener('click', () => {
   againBtn.focus();
 });
 againBtn.addEventListener('click', showNameEntry);
+
+// ---------- Scoreboard reset (password protected) ----------
+const RESET_PASSWORD = 'DISCOVER2026';
+const pwPanel = document.getElementById('pwPanel');
+const pwInput = document.getElementById('pwInput');
+const pwMsg = document.getElementById('pwMsg');
+const pwOsk = document.getElementById('pwOsk');
+let pwValue = '';
+function pwShow() { pwInput.value = '•'.repeat(pwValue.length); }
+function openPw() {
+  pwValue = ''; pwShow(); pwMsg.textContent = ''; pwMsg.className = 'pwmsg';
+  pwPanel.hidden = false;
+}
+function closePw() { pwPanel.hidden = true; pwValue = ''; pwShow(); againBtn.focus(); }
+function resetScores() {
+  try { localStorage.removeItem(LS_KEY); } catch (e) {}
+  if (LB.db && LB.docs) {
+    for (const d of LB.docs) {
+      try { (d.ref && d.ref.delete) ? d.ref.delete() : LB.db.collection('scores').doc(d.id).delete(); } catch (e) {}
+    }
+  }
+  LB.rows = []; LB.mine = null; renderBoard();
+  if (resultTitle.textContent === 'High score!') resultTitle.textContent = 'Scoreboard';
+}
+function pwKey(v) {
+  if (v === 'DONE') {
+    if (pwValue === RESET_PASSWORD) {
+      resetScores();
+      pwMsg.textContent = 'Scoreboard reset.'; pwMsg.className = 'pwmsg ok';
+      setTimeout(closePw, 900);
+    } else {
+      pwMsg.textContent = 'Wrong password.'; pwMsg.className = 'pwmsg';
+      pwValue = ''; pwShow();
+    }
+    return;
+  }
+  pwMsg.textContent = '';
+  if (v === 'BACK') pwValue = pwValue.slice(0, -1);
+  else if (pwValue.length < 24 && v !== ' ') pwValue += v;
+  pwShow();
+}
+buildKeyboard(pwOsk, 'Enter', pwKey);
+document.getElementById('resetBtn').addEventListener('click', openPw);
+document.getElementById('pwCancel').addEventListener('click', closePw);
+document.getElementById('pwOk').addEventListener('click', () => pwKey('DONE'));
 
 // ---------- Loop ----------
 buildLevel(); popups = []; spawnPlayer(0); resetEnemies();
