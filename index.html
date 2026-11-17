@@ -16,27 +16,28 @@ body{
   display:flex;align-items:center;justify-content:center;
   touch-action:manipulation;-webkit-touch-callout:none;
 }
-.stage{position:relative;width:100vw;height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));container-type:size;--u:min(1cqw,1.6667cqh);transition:width .25s ease,height .25s ease}
-.stage.compact{width:60vw;height:60dvh;box-shadow:0 0 0 max(3px,.4cqh) #F3F3EF,0 0 0 max(6px,.8cqh) #1A1B22,0 1.5cqh 0 max(6px,.8cqh) rgba(0,0,0,.35)}
-.sizeBtn{position:absolute;top:calc(1.32*var(--u));right:calc(1.2*var(--u));width:calc(4.8*var(--u));height:calc(4.8*var(--u));padding:0;display:grid;place-items:center;background:rgba(14,22,48,.55);color:#fff;border:calc(0.27*var(--u)) solid rgba(255,255,255,.8);border-radius:0;cursor:pointer;z-index:5;touch-action:manipulation}
+.stage{position:relative;width:100vw;height:100vh;--u:10px;--uk:8.2px;transition:width .25s ease,height .25s ease;flex:none}
+.stage.compact{box-shadow:0 0 0 calc(.25*var(--u)) #F3F3EF,0 0 0 calc(.5*var(--u)) #1A1B22,0 calc(.9*var(--u)) 0 calc(.5*var(--u)) rgba(0,0,0,.35)}
+.sizeBtn{position:absolute;top:calc(1.32*var(--u));right:calc(1.2*var(--u));width:calc(4.8*var(--u));height:calc(4.8*var(--u));padding:0;display:flex;align-items:center;justify-content:center;background:rgba(14,22,48,.55);color:#fff;border:calc(0.27*var(--u)) solid rgba(255,255,255,.8);border-radius:0;cursor:pointer;z-index:5;touch-action:manipulation}
 .sizeBtn:active{background:rgba(255,210,63,.5)}
 .sizeBtn svg{width:60%;height:60%;shape-rendering:crispEdges}
 canvas{width:100%;height:100%;display:block;touch-action:none}
 canvas:focus{outline:none}
 .touch{display:flex;position:absolute;left:0;right:0;bottom:0;justify-content:space-between;padding:calc(2*var(--u));pointer-events:none}
-.touch .pad{display:flex;gap:calc(2*var(--u))}
+.touch .pad{display:flex;}
 .touch button{
   pointer-events:auto;width:calc(10*var(--u));height:calc(10*var(--u));border-radius:50%;padding:0;
-  display:grid;place-items:center;
+  display:flex;align-items:center;justify-content:center;
   border:calc(.3*var(--u)) solid rgba(255,255,255,.65);background:rgba(30,25,60,.35);color:#fff;
   touch-action:none;user-select:none;-webkit-user-select:none;cursor:pointer;
 }
 .touch button svg{width:52%;height:52%;shape-rendering:crispEdges;pointer-events:none}
 .touch button:active{background:rgba(255,210,63,.45)}
-.panel{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(14,22,48,.72);overflow:auto;padding:calc(2*var(--u));box-sizing:border-box}
+.panel{position:absolute;top:0;right:0;bottom:0;left:0;display:flex;align-items:center;justify-content:center;background:rgba(14,22,48,.72);overflow:auto;padding:calc(2*var(--u));box-sizing:border-box}
 .panel[hidden]{display:none}
-.card{background:#14204A;color:#F3F3EF;border:calc(.35*var(--u)) solid #F3F3EF;box-shadow:0 0 0 calc(.35*var(--u)) #1A1B22,calc(.8*var(--u)) calc(.8*var(--u)) 0 calc(.35*var(--u)) rgba(0,0,0,.35);padding:calc(2.4*var(--u)) calc(3*var(--u));width:min(100%,calc(64*var(--u)));display:flex;flex-direction:column;align-items:center;gap:calc(1.3*var(--u));text-align:center;box-sizing:border-box;margin:auto}
-.card.wide{width:min(100%,calc(72*var(--u)))}
+.card{background:#14204A;color:#F3F3EF;border:calc(.35*var(--u)) solid #F3F3EF;box-shadow:0 0 0 calc(.35*var(--u)) #1A1B22,calc(.8*var(--u)) calc(.8*var(--u)) 0 calc(.35*var(--u)) rgba(0,0,0,.35);padding:calc(2.4*var(--u)) calc(3*var(--u));width:calc(64*var(--u));max-width:100%;display:flex;flex-direction:column;align-items:center;text-align:center;box-sizing:border-box;margin:auto}
+.card.wide{width:calc(72*var(--u));max-width:100%}
+#namePanel .card,#pwPanel .card{--u:var(--uk)}
 .card h2{margin:0;font-weight:700;font-size:calc(3.8*var(--u));color:#FFD23F}
 .sub{margin:0;font-size:calc(1.7*var(--u));color:#C9D6F2;line-height:1.4}
 #nameInput{font:700 calc(3*var(--u)) "Silkscreen",monospace;width:100%;max-width:calc(44*var(--u));padding:.35em .6em;border:calc(.35*var(--u)) solid #F3F3EF;background:#0B1330;color:#fff;text-align:center;letter-spacing:.08em;text-transform:uppercase;border-radius:0;box-sizing:border-box}
@@ -44,9 +45,9 @@ canvas:focus{outline:none}
 #nameInput::placeholder{color:#7083B8;text-transform:none;letter-spacing:0}
 #nameInput,#pwInput{cursor:default;caret-color:transparent}
 #nameInput:focus{outline:calc(.35*var(--u)) solid #47F2FF;outline-offset:2px}
-.osk{display:flex;flex-direction:column;gap:calc(.6*var(--u));width:100%}
+.osk{display:flex;flex-direction:column;width:100%}
 .osk[hidden]{display:none}
-.osk .row{display:flex;justify-content:center;gap:calc(.6*var(--u))}
+.osk .row{display:flex;justify-content:center;}
 .osk button{flex:1 1 0;max-width:calc(5.8*var(--u));height:calc(5*var(--u));font:700 calc(2*var(--u)) "Silkscreen",monospace;background:#2B3A6E;color:#fff;border:calc(.25*var(--u)) solid #5F75B8;border-bottom-width:calc(.5*var(--u));border-radius:calc(.4*var(--u));touch-action:manipulation;user-select:none;-webkit-user-select:none;padding:0;cursor:pointer}
 .osk button:active{transform:translateY(calc(.25*var(--u)));border-bottom-width:calc(.25*var(--u))}
 .osk button.wide{max-width:none;flex:3 1 0}
@@ -54,7 +55,7 @@ canvas:focus{outline:none}
 .primary{font:700 calc(2.8*var(--u)) "Silkscreen",monospace;background:#FFD23F;color:#1A1B22;border:calc(.35*var(--u)) solid #1A1B22;box-shadow:0 calc(.5*var(--u)) 0 #9C7A12;padding:.35em 1.6em;cursor:pointer;touch-action:manipulation}
 .primary:disabled{opacity:.45;cursor:default}
 .primary:active:not(:disabled){transform:translateY(calc(.35*var(--u)));box-shadow:0 calc(.15*var(--u)) 0 #9C7A12}
-.links{display:flex;gap:calc(3*var(--u));justify-content:center;flex-wrap:wrap}
+.links{display:flex;justify-content:center;flex-wrap:wrap}
 .link{background:none;border:none;color:#9FD8FF;font:400 calc(1.7*var(--u)) "Silkscreen",monospace;text-decoration:underline;cursor:pointer;padding:4px}
 .link[hidden],.links[hidden]{display:none}
 .lb{width:100%;border-collapse:collapse;font-size:calc(2*var(--u))}
@@ -63,15 +64,21 @@ canvas:focus{outline:none}
 .lb td:nth-child(n+3),.lb th:nth-child(n+3){text-align:right;font-variant-numeric:tabular-nums}
 .lb tr.me td{background:#FFD23F;color:#1A1B22}
 .lb tr.gap td{color:#6F7FAF;text-align:center}
-.resetBtn{position:absolute;right:calc(2*var(--u));bottom:calc(2*var(--u));width:calc(6*var(--u));height:calc(6*var(--u));padding:0;display:grid;place-items:center;background:rgba(14,22,48,.75);color:#fff;border:calc(.35*var(--u)) solid rgba(255,255,255,.8);cursor:pointer;touch-action:manipulation;z-index:2}
+.resetBtn{position:absolute;right:calc(2*var(--u));bottom:calc(2*var(--u));width:calc(6*var(--u));height:calc(6*var(--u));padding:0;display:flex;align-items:center;justify-content:center;background:rgba(14,22,48,.75);color:#fff;border:calc(.35*var(--u)) solid rgba(255,255,255,.8);cursor:pointer;touch-action:manipulation;z-index:2}
 .resetBtn:active{background:rgba(255,210,63,.5)}
 .resetBtn svg{width:60%;height:60%;shape-rendering:crispEdges}
 .panel.top{z-index:6}
 .pwmsg{margin:0;min-height:1.4em;font-size:calc(1.8*var(--u));color:#FF8FA3}
 .pwmsg.ok{color:#9BE564}
-.pwbtns{display:flex;gap:calc(2*var(--u));justify-content:center}
+.pwbtns{display:flex;justify-content:center}
 .primary.ghost{background:#2B3A6E;color:#fff;border-color:#5F75B8;box-shadow:0 calc(.5*var(--u)) 0 #1A2550}
 .lb tr.empty td{text-align:center;color:#8EA0D0;padding:calc(1.4*var(--u))}
+.touch .pad>*+*{margin-left:calc(2*var(--u))}
+.card>*+*{margin-top:calc(1.3*var(--u))}
+.osk>*+*{margin-top:calc(.6*var(--u))}
+.osk .row>*+*{margin-left:calc(.6*var(--u))}
+.links>*+*{margin-left:calc(3*var(--u))}
+.pwbtns>*+*{margin-left:calc(2*var(--u))}
 </style>
 </head>
 <body>
@@ -93,7 +100,6 @@ canvas:focus{outline:none}
       <button class="primary" id="startBtn" type="button" disabled>Start</button>
       <div class="links">
         <button class="link" id="boardBtn" type="button">View leaderboard</button>
-        <button class="link" id="fsBtn" type="button" hidden>Full screen</button>
       </div>
     </div>
   </div>
@@ -290,16 +296,29 @@ const stageEl = document.querySelector('.stage');
 const sizeBtn = document.getElementById('sizeBtn');
 const ICON_MAX = '<svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M2 2h5v2H4v3H2zM9 2h5v5h-2V4H9zM2 9h2v3h3v2H2zM12 9h2v5H9v-2h3z"/></svg>';
 const ICON_MIN = '<svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M5 2h2v5H2V5h3zM9 2h2v3h3v2H9zM2 9h5v5H5v-3H2zM9 9h5v2h-3v3H9z"/></svg>';
+// Sizes are measured here in plain pixels so every browser, old or new, lays out the same.
+function fitStage() {
+  const de = document.documentElement;
+  const ww = window.innerWidth || de.clientWidth, wh = window.innerHeight || de.clientHeight;
+  const f = stageEl.classList.contains('compact') ? 0.6 : 1;
+  const sw = Math.round(ww * f), sh = Math.round(wh * f);
+  stageEl.style.width = sw + 'px'; stageEl.style.height = sh + 'px';
+  const u = Math.min(sw / 100, sh / 60);
+  stageEl.style.setProperty('--u', u.toFixed(3) + 'px');
+  stageEl.style.setProperty('--uk', (u * 0.82).toFixed(3) + 'px');
+}
 function setCompact(on) {
   stageEl.classList.toggle('compact', on);
+  fitStage(); fitCanvas(); setTimeout(fitCanvas, 300);
   sizeBtn.innerHTML = on ? ICON_MAX : ICON_MIN;
   sizeBtn.setAttribute('aria-label', on ? 'Make game bigger' : 'Make game smaller');
 }
 sizeBtn.addEventListener('click', () => { setCompact(!stageEl.classList.contains('compact')); sizeBtn.blur(); if (state === 'play') cv.focus(); });
 setCompact(false);
-addEventListener('resize', fitCanvas);
+addEventListener('resize', () => { fitStage(); fitCanvas(); });
+addEventListener('orientationchange', () => setTimeout(() => { fitStage(); fitCanvas(); }, 300));
 if (window.ResizeObserver) new ResizeObserver(fitCanvas).observe(cv);
-fitCanvas();
+fitStage(); fitCanvas();
 
 let grid, coins, spawns, bumps;
 let player, enemies, popups;
@@ -795,9 +814,9 @@ addEventListener('keydown', e => {
   if (state !== 'name' || namePanel.hidden) return;
   if (e.key === 'Enter') { e.preventDefault(); tryStart(); return; }
   if (e.key === 'Backspace') { e.preventDefault(); typeKey('BACK'); return; }
-  if (e.key.length === 1 && /[\p{L}\p{N} ._-]/u.test(e.key)) { e.preventDefault(); typeKey(e.key.toUpperCase()); }
+  if (e.key.length === 1 && /^[A-Za-z0-9\u00C0-\u024F ._-]$/.test(e.key)) { e.preventDefault(); typeKey(e.key.toUpperCase()); }
 });
-const cleanName = v => v.replace(/[^\p{L}\p{N} ._-]/gu, '').replace(/\s+/g, ' ').slice(0, 12);
+const cleanName = v => v.replace(/[^A-Za-z0-9\u00C0-\u024F ._-]/g, '').replace(/\s+/g, ' ').slice(0, 12);
 function syncName() {
   const v = cleanName(nameInput.value);
   if (v !== nameInput.value) nameInput.value = v;
@@ -842,19 +861,6 @@ function buildKeyboard(box, doneLabel, onKey) {
 buildKeyboard(osk, 'Done', v => { if (v === 'DONE') tryStart(); else typeKey(v); });
 
 
-// ---------- Full screen ----------
-const fsBtn = document.getElementById('fsBtn');
-const root = document.documentElement;
-const canFs = !!(root.requestFullscreen || root.webkitRequestFullscreen);
-const isFs = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
-function syncFs() { fsBtn.hidden = !canFs; fsBtn.textContent = isFs() ? 'Exit full screen' : 'Full screen'; }
-fsBtn.addEventListener('click', () => {
-  if (isFs()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
-  else (root.requestFullscreen || root.webkitRequestFullscreen).call(root);
-});
-document.addEventListener('fullscreenchange', syncFs);
-document.addEventListener('webkitfullscreenchange', syncFs);
-syncFs();
 
 // ---------- Leaderboard ----------
 const LS_KEY = 'robot-run-leaderboard-v1';
@@ -883,7 +889,7 @@ function saveEntry(entry) {
 function cell(tr, v) { const td = document.createElement('td'); td.textContent = v; tr.append(td); }
 function renderBoard() {
   const rows = LB.rows.slice().sort(byRank);
-  lbBody.replaceChildren();
+  while (lbBody.firstChild) lbBody.removeChild(lbBody.firstChild);
   if (!rows.length) {
     const tr = document.createElement('tr'); tr.className = 'empty';
     const td = document.createElement('td'); td.colSpan = 5; td.textContent = 'No finished runs yet. Be the first!';
