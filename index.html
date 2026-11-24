@@ -37,7 +37,7 @@ canvas:focus{outline:none}
 .panel[hidden]{display:none}
 .card{background:#14204A;color:#F3F3EF;border:calc(.35*var(--u)) solid #F3F3EF;box-shadow:0 0 0 calc(.35*var(--u)) #1A1B22,calc(.8*var(--u)) calc(.8*var(--u)) 0 calc(.35*var(--u)) rgba(0,0,0,.35);padding:calc(2.4*var(--u)) calc(3*var(--u));width:calc(64*var(--u));max-width:100%;display:flex;flex-direction:column;align-items:center;text-align:center;box-sizing:border-box;margin:auto}
 .card.wide{width:calc(72*var(--u));max-width:100%}
-#namePanel .card,#pwPanel .card{--u:var(--uk)}
+#namePanel .card,#pwPanel .card{--u:var(--uk);width:calc(70*var(--u))}
 .card h2{margin:0;font-weight:700;font-size:calc(3.8*var(--u));color:#FFD23F}
 .sub{margin:0;font-size:calc(1.7*var(--u));color:#C9D6F2;line-height:1.4}
 #nameInput{font:700 calc(3*var(--u)) "Silkscreen",monospace;width:100%;max-width:calc(44*var(--u));padding:.35em .6em;border:calc(.35*var(--u)) solid #F3F3EF;background:#0B1330;color:#fff;text-align:center;letter-spacing:.08em;text-transform:uppercase;border-radius:0;box-sizing:border-box}
@@ -48,10 +48,11 @@ canvas:focus{outline:none}
 .osk{display:flex;flex-direction:column;width:100%}
 .osk[hidden]{display:none}
 .osk .row{display:flex;justify-content:center;}
-.osk button{flex:1 1 0;max-width:calc(5.8*var(--u));height:calc(5*var(--u));font:700 calc(2*var(--u)) "Silkscreen",monospace;background:#2B3A6E;color:#fff;border:calc(.25*var(--u)) solid #5F75B8;border-bottom-width:calc(.5*var(--u));border-radius:calc(.4*var(--u));touch-action:manipulation;user-select:none;-webkit-user-select:none;padding:0;cursor:pointer}
+.osk button{flex:0 0 auto;width:calc(5.2*var(--u));height:calc(5*var(--u));font:700 calc(2*var(--u)) "Silkscreen",monospace;background:#2B3A6E;color:#fff;border:calc(.25*var(--u)) solid #5F75B8;border-bottom-width:calc(.5*var(--u));border-radius:calc(.4*var(--u));touch-action:manipulation;user-select:none;-webkit-user-select:none;padding:0;cursor:pointer}
 .osk button:active{transform:translateY(calc(.25*var(--u)));border-bottom-width:calc(.25*var(--u))}
-.osk button.wide{max-width:none;flex:3 1 0}
-.osk button.go{max-width:none;flex:1.6 1 0;background:#FFD23F;color:#1A1B22;border-color:#9C7A12}
+.osk button.wide{width:calc(24*var(--u))}
+.osk button[data-v="BACK"]{font-size:calc(3.2*var(--u));line-height:1}
+.osk button.go{width:calc(16*var(--u));background:#FFD23F;color:#1A1B22;border-color:#9C7A12}
 .primary{font:700 calc(2.8*var(--u)) "Silkscreen",monospace;background:#FFD23F;color:#1A1B22;border:calc(.35*var(--u)) solid #1A1B22;box-shadow:0 calc(.5*var(--u)) 0 #9C7A12;padding:.35em 1.6em;cursor:pointer;touch-action:manipulation}
 .primary:disabled{opacity:.45;cursor:default}
 .primary:active:not(:disabled){transform:translateY(calc(.35*var(--u)));box-shadow:0 calc(.15*var(--u)) 0 #9C7A12}
@@ -843,13 +844,14 @@ const keyBtn = (label, v, cls) => {
   return b;
 };
 function buildKeyboard(box, doneLabel, onKey) {
-  ['1234567890', 'QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM'].forEach(r => {
+  const rows = [['1','2','3','4','5','6','7','8','9','0','BACK'], 'QWERTYUIOP'.split(''), 'ASDFGHJKL'.split(''), 'ZXCVBNM.-'.split('')];
+  rows.forEach(r => {
     const row = document.createElement('div'); row.className = 'row';
-    for (const ch of r) row.append(keyBtn(ch, ch));
+    for (const ch of r) row.append(ch === 'BACK' ? keyBtn('⌫', 'BACK') : keyBtn(ch, ch));
     box.append(row);
   });
   const lastRow = document.createElement('div'); lastRow.className = 'row';
-  lastRow.append(keyBtn('⌫', 'BACK'), keyBtn('Space', ' ', 'wide'), keyBtn(doneLabel, 'DONE', 'go'));
+  lastRow.append(doneLabel ? keyBtn(doneLabel, 'DONE', 'go') : keyBtn('Space', ' ', 'wide'));
   box.append(lastRow);
   box.addEventListener('mousedown', e => e.preventDefault());
   box.addEventListener('pointerdown', e => {
@@ -858,7 +860,7 @@ function buildKeyboard(box, doneLabel, onKey) {
     onKey(b.dataset.v);
   });
 }
-buildKeyboard(osk, 'Done', v => { if (v === 'DONE') tryStart(); else typeKey(v); });
+buildKeyboard(osk, '', typeKey);
 
 
 
