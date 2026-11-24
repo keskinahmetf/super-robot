@@ -37,6 +37,8 @@ canvas:focus{outline:none}
 .panel[hidden]{display:none}
 .card{background:#14204A;color:#F3F3EF;border:calc(.35*var(--u)) solid #F3F3EF;box-shadow:0 0 0 calc(.35*var(--u)) #1A1B22,calc(.8*var(--u)) calc(.8*var(--u)) 0 calc(.35*var(--u)) rgba(0,0,0,.35);padding:calc(2.4*var(--u)) calc(3*var(--u));width:calc(64*var(--u));max-width:100%;display:flex;flex-direction:column;align-items:center;text-align:center;box-sizing:border-box;margin:auto}
 .card.wide{width:calc(72*var(--u));max-width:100%}
+#dupPanel .card{--u:calc(var(--uk) * 0.9756);width:calc(56*var(--u))}
+#dupPanel .sub{font-size:calc(2*var(--u))}
 #namePanel .card,#pwPanel .card{--u:var(--uk);width:calc(70*var(--u))}
 .card h2{margin:0;font-weight:700;font-size:calc(3.8*var(--u));color:#FFD23F}
 .sub{margin:0;font-size:calc(1.7*var(--u));color:#C9D6F2;line-height:1.4}
@@ -114,6 +116,15 @@ canvas:focus{outline:none}
       <button class="primary" id="againBtn" type="button">Play again</button>
     </div>
     <button class="resetBtn" id="resetBtn" type="button" aria-label="Reset scoreboard"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M5 1h6v2h2v2h-2v2h-2V5H7V3H5zM3 3h2v2H3zM1 5h2v6H1zM3 11h2v2H3zM5 13h6v2H5zM11 11h2v2h-2zM13 7h2v4h-2zM9 7h6v2H9z"/></svg></button>
+  </div>
+  <div class="panel top" id="dupPanel" hidden>
+    <div class="card">
+      <h2>A user with this name already exists.</h2>
+      <div class="pwbtns">
+        <button class="primary ghost" id="dupRename" type="button">Rename</button>
+        <button class="primary" id="dupPlay" type="button">Play</button>
+      </div>
+    </div>
   </div>
   <div class="panel top" id="pwPanel" hidden>
     <div class="card">
@@ -812,6 +823,11 @@ addEventListener('keydown', e => {
     else if (e.key.length === 1) pwKey(e.key.toUpperCase());
     return;
   }
+  if (!dupPanel.hidden) {
+    e.preventDefault();
+    if (e.key === 'Enter') dupPlay(); else if (e.key === 'Escape' || e.key === 'Backspace') dupRename();
+    return;
+  }
   if (state !== 'name' || namePanel.hidden) return;
   if (e.key === 'Enter') { e.preventDefault(); tryStart(); return; }
   if (e.key === 'Backspace') { e.preventDefault(); typeKey('BACK'); return; }
@@ -823,11 +839,24 @@ function syncName() {
   if (v !== nameInput.value) nameInput.value = v;
   startBtn.disabled = !v.trim();
 }
+const sameName = (a, b) => String(a).trim().toUpperCase() === String(b).trim().toUpperCase();
 function tryStart() {
   const v = cleanName(nameInput.value).trim().toUpperCase();
   if (!v) return;
+  if (LB.rows.some(r => sameName(r.name, v))) { openDup(v); return; }
   startGame(v);
 }
+// ---------- Name already on the leaderboard ----------
+const dupPanel = document.getElementById('dupPanel');
+let dupName = '';
+function openDup(v) {
+  dupName = v;
+  dupPanel.hidden = false;
+}
+function dupRename() { dupPanel.hidden = true; }
+function dupPlay() { dupPanel.hidden = true; startGame(dupName); }
+document.getElementById('dupRename').addEventListener('click', dupRename);
+document.getElementById('dupPlay').addEventListener('click', dupPlay);
 function typeKey(v) {
   if (v === 'BACK') nameInput.value = nameInput.value.slice(0, -1);
   else if (nameInput.value.length < 12 && !(v === ' ' && !nameInput.value)) nameInput.value += v;
@@ -874,18 +903,26 @@ function loadLocal() { try { return JSON.parse(localStorage.getItem(LS_KEY)) || 
 function saveLocal(rows) { try { localStorage.setItem(LS_KEY, JSON.stringify(rows.sort(byRank).slice(0, 200))); } catch (e) {} }
 LB.rows = loadLocal();
 
+// One row per name: a new run only replaces the old one when it scores higher.
 function saveEntry(entry) {
+  const same = LB.rows.filter(r => sameName(r.name, entry.name));
+  if (same.some(r => byRank(r, entry) <= 0)) { LB.mine = null; return false; }
   LB.mine = entry;
   if (LB.db && LB.useDb) {
+    (LB.docs || []).forEach(d => {
+      const r = d.data();
+      if (r && sameName(r.name, entry.name)) { try { (d.ref && d.ref.delete) ? d.ref.delete() : LB.db.collection('scores').doc(d.id).delete(); } catch (e) {} }
+    });
     LB.db.collection('scores').add(entry).catch(() => {
       LB.useDb = false;
-      const rows = loadLocal(); rows.push(entry); saveLocal(rows); LB.rows = loadLocal();
+      const rows = loadLocal().filter(r => !sameName(r.name, entry.name)); rows.push(entry); saveLocal(rows); LB.rows = loadLocal();
       renderBoard();
     });
-    if (!LB.rows.some(r => r.at === entry.at && r.name === entry.name)) LB.rows = LB.rows.concat(entry);
+    LB.rows = LB.rows.filter(r => !sameName(r.name, entry.name)).concat(entry);
   } else {
-    const rows = loadLocal(); rows.push(entry); saveLocal(rows); LB.rows = loadLocal();
+    const rows = loadLocal().filter(r => !sameName(r.name, entry.name)); rows.push(entry); saveLocal(rows); LB.rows = loadLocal();
   }
+  return true;
 }
 
 function cell(tr, v) { const td = document.createElement('td'); td.textContent = v; tr.append(td); }
